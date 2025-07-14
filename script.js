@@ -1,54 +1,92 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const canvas = document.getElementById('frequencyCanvas');
-    const ctx = canvas.getContext('2d');
 
+document.addEventListener('DOMContentLoaded', function () {
+    const svg = document.getElementById('frequencySvg');
     const frequencyBands = {
         '2.4GHz': { start: 2412, step_size: 5, channel_n: 13, channel_width: 20 },
-        //'5GHz': { start: 5150, end: 2.4835 },
-        //'6Ghz': { start: 2.4, end: 2.5 }
-        // Weitere Standards hinzufügen
+        // Additional bands can be added here
     };
 
     // Track objects
     let semicircles = [];
     let tickPositions = [];
-    let current_Band = '2.4GHz';
+    let currentBand = '2.4GHz';
 
-    // constants
-    const offset = canvas.width / 7;
-    const width = canvas.width - 2 * offset;
-    const scaleX = width / frequencyBands[current_Band].channel_n;
-    const semicircle_offset = 50;
-    const line_offset_top = 45;
-    const line_offset_bottom = 30;
+    // Constants
+    const svgWidth = svg.clientWidth;
+    const svgHeight = svg.clientHeight;
+    const offset = svgWidth / 7;
+    const width = svgWidth - 2 * offset;
+    const scaleX = width / frequencyBands[currentBand].channel_n;
+    const semicircleOffset = 50;
+    const lineOffsetTop = 45;
+    const lineOffsetBottom = 30;
 
     // Function to draw the frequency range
     function drawFrequencyRange() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        svg.innerHTML = '';
+        tickPositions = [];
 
         // Draw the number line
-        for (let i = 0; i < frequencyBands[current_Band].channel_n; i++) {
+        for (let i = 0; i < frequencyBands[currentBand].channel_n; i++) {
             const x = i * scaleX + offset;
-            ctx.beginPath();
-            ctx.moveTo(x, canvas.height - line_offset_bottom);
-            ctx.lineTo(x, canvas.height - line_offset_top);
-            ctx.stroke();
+
+            // Draw tick mark
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x);
+            line.setAttribute("y1", svgHeight - lineOffsetBottom);
+            line.setAttribute("x2", x);
+            line.setAttribute("y2", svgHeight - lineOffsetTop);
+            line.setAttribute("stroke", "black");
+            svg.appendChild(line);
+
             tickPositions.push(x);
 
-            // Add numbering to the semicircles
-            ctx.fillStyle = 'black';
-            ctx.font = '12px Arial';
-            ctx.fillText((i + 1).toString(), x - 5, canvas.height - 15);
-            ctx.font = '10px Arial';
-            ctx.fillText((frequencyBands[current_Band].start + i * frequencyBands[current_Band].step_size).toString(), x - 10, canvas.height - 5);
+            // Add numbering to the ticks
+            const channelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            channelText.setAttribute("x", x);
+            channelText.setAttribute("y", svgHeight - 15);
+            channelText.setAttribute("text-anchor", "middle");
+            channelText.setAttribute("font-size", "12px");
+            channelText.setAttribute("fill", "black");
+            channelText.textContent = (i + 1).toString();
+            svg.appendChild(channelText);
+
+            const frequencyText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            frequencyText.setAttribute("x", x);
+            frequencyText.setAttribute("y", svgHeight - 5);
+            frequencyText.setAttribute("text-anchor", "middle");
+            frequencyText.setAttribute("font-size", "10px");
+            frequencyText.setAttribute("fill", "black");
+            frequencyText.textContent = (frequencyBands[currentBand].start + i * frequencyBands[currentBand].step_size).toString();
+            svg.appendChild(frequencyText);
         }
 
         // Redraw existing semicircles
+        // Redraw existing semicircles
         semicircles.forEach(semicircle => {
-            ctx.beginPath();
-            ctx.arc(semicircle.x, semicircle.y, semicircle.r, Math.PI, 2 * Math.PI);
-            ctx.fillStyle = semicircle.color;
-            ctx.fill();
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const startAngle = 0;
+            const endAngle = Math.PI;
+            const x = semicircle.x;
+            const y = semicircle.y;
+            const r = semicircle.r;
+
+            const startX = x-r;
+            const startY = y;
+            const endX = x + r;
+            const endY = y;
+
+            //const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+            const d = [
+                "M", startX, startY,
+                "A", r, r, 0, 0, 1, endX, endY,
+                "L", startX, startY
+            ].join(" ");
+
+            path.setAttribute("d", d);
+            path.setAttribute("fill", semicircle.color);
+            svg.appendChild(path);
         });
     }
 
@@ -69,16 +107,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             semicircles[i].color = overlap ? 'red' : 'green';
         }
-        const initialRange = frequencyBands['2.4GHz'];
         drawFrequencyRange();
     }
 
-    // Event listener for clicks on the canvas
-    canvas.addEventListener('click', function (event) {
-        const rect = canvas.getBoundingClientRect();
+    // Event listener for clicks on the SVG
+    svg.addEventListener('click', function (event) {
+        const rect = svg.getBoundingClientRect();
         const clickX = event.clientX - rect.left;
-        const y = canvas.height - semicircle_offset; // Fixed y position for semicircles
-        const r = 2 * scaleX; // Radius of semicircles
+        const y = svgHeight - semicircleOffset; // Fixed y position for semicircles
+        const r = (frequencyBands[currentBand].channel_width / frequencyBands[currentBand].step_size) / 2 * scaleX; // Radius of semicircles
 
         // Find the nearest tick position to the clicked x-coordinate
         const nearestTickX = tickPositions.reduce((prev, curr) => {

@@ -5,10 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WLAN Frequenzband Spiel</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .svg-container {
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        svg {
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
-    <div class="canvas-container">
-        <canvas id="frequencyCanvas" width="600" height="200"></canvas>
+    <div class="svg-container">
+        <svg id="frequencySvg" width="600" height="200"></svg>
     </div>
     <script src="script.js"></script>
 </body>
