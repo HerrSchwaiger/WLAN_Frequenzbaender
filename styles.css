@@ -1,0 +1,18 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* Optional: just for better visibility */
+}
+
+.canvas-container {
+    padding: 20px; /* Padding around the canvas */
+    background-color: white; /* Optional: just for better visibility */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+}
+
+canvas {
+    border: 1px solid #ccc; /* Optional: adds a border around the canvas */
+}
