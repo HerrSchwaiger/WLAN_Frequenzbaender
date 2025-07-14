@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             path.setAttribute("d", d);
             path.setAttribute("fill", semicircle.color);
+            path.setAttribute("fill-opacity", "0.7");
             svg.appendChild(path);
         });
     }
