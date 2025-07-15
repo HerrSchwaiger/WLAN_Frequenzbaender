@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const svg = document.getElementById('frequencySvg');
     const frequencyBands = {
@@ -60,9 +59,10 @@ document.addEventListener('DOMContentLoaded', function () {
             frequencyText.textContent = (frequencyBands[currentBand].start + i * frequencyBands[currentBand].step_size).toString();
             svg.appendChild(frequencyText);
         }
+        // Redraw existing semicircles
+        // Redraw existing semicircles
 
-        // Redraw existing semicircles
-        // Redraw existing semicircles
+        let correct = 0;
         semicircles.forEach(semicircle => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             const startAngle = 0;
@@ -88,7 +88,20 @@ document.addEventListener('DOMContentLoaded', function () {
             path.setAttribute("fill", semicircle.color);
             path.setAttribute("fill-opacity", "0.7");
             svg.appendChild(path);
+
+            if (semicircle.color == 'green') {
+                correct++;
+            }
         });
+
+        if (correct == 4) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
     }
 
     // Function to check for overlaps
@@ -132,8 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
             semicircles.push({ x: nearestTickX, y, r, color: 'green' });
         }
 
-        // Redraw the frequency range and check for overlaps
-        drawFrequencyRange();
         checkOverlaps();
     });
 
