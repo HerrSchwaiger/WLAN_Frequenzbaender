@@ -93,15 +93,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to check for overlaps
     function checkOverlaps() {
+        let noise = 0.0001;
         for (let i = 0; i < semicircles.length; i++) {
             let overlap = false;
             for (let j = 0; j < semicircles.length; j++) {
                 if (i !== j) {
-                    const dx = semicircles[i].x - semicircles[j].x;
-                    const dy = semicircles[i].y - semicircles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < semicircles[i].r + semicircles[j].r) {
+                    const dx = Math.abs(semicircles[i].x - semicircles[j].x);
+                    if (dx < 2* semicircles[i].r - noise) {
                         overlap = true;
                     }
                 }
